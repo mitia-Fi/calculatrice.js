@@ -1,8 +1,8 @@
-/* RESET & BASE */
 * {
-  box-sizing: border-box;
   margin: 0;
   padding: 0;
+  box-sizing: border-box;
+  font-family: 'Segoe UI', -apple-system, system-ui, sans-serif;
 }
 
 body {
@@ -10,184 +10,188 @@ body {
   display: flex;
   justify-content: center;
   align-items: center;
-  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', system-ui, sans-serif;
+  background: linear-gradient(135deg, #141e30, #243b55);
   padding: 20px;
 }
 
-/* CALCULATRICE */
+/* Container principal */
 #calculatrice {
   width: 320px;
-  background: #0f172a;
-  border-radius: 24px;
+  background: #1a1a1a;
+  border-radius: 20px;
   box-shadow: 
-    0 20px 40px rgba(0, 0, 0, 0.4),
-    0 0 0 1px rgba(255, 255, 255, 0.1);
+    0 15px 35px rgba(0, 0, 0, 0.5),
+    0 5px 15px rgba(0, 0, 0, 0.3);
   overflow: hidden;
-}
-
-/* EN-TÊTE AVEC CONTROLES */
-.options {
-  position: absolute;
-  top: 16px;
-  left: 16px;
-  display: flex;
-  gap: 10px;
-  z-index: 10;
-}
-
-span.action {
-  width: 14px;
-  height: 14px;
-  border-radius: 50%;
-  cursor: pointer;
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  font-size: 10px;
-  font-weight: bold;
-  color: transparent;
-  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  border: 1px solid #333;
   position: relative;
-  border: 1px solid rgba(255, 255, 255, 0.1);
 }
 
-span.action:hover {
-  transform: scale(1.3);
-  box-shadow: 0 0 10px currentColor;
+/* En-tête avec contrôles */
+.header {
+  padding: 15px 20px;
+  background: linear-gradient(to right, #2a2a2a, #1f1f1f);
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  border-bottom: 1px solid #333;
 }
 
-span.action:hover::after {
+.controls {
+  display: flex;
+  gap: 8px;
+}
+
+.control-btn {
+  width: 12px;
+  height: 12px;
+  border-radius: 50%;
+  border: none;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 8px;
+  color: transparent;
+  position: relative;
+}
+
+.control-btn:hover {
+  transform: scale(1.2);
+}
+
+.control-btn:hover::after {
   content: attr(data-tooltip);
   position: absolute;
-  bottom: -24px;
+  bottom: -20px;
   left: 50%;
   transform: translateX(-50%);
   background: rgba(0, 0, 0, 0.8);
   color: white;
-  padding: 4px 10px;
-  border-radius: 6px;
+  padding: 3px 8px;
+  border-radius: 4px;
   font-size: 10px;
   white-space: nowrap;
-  z-index: 100;
-  border: 1px solid rgba(255, 255, 255, 0.1);
+  z-index: 10;
 }
 
 .quit {
-  background: linear-gradient(145deg, #ef4444, #dc2626);
+  background-color: #ff5f57;
 }
 
 .reduce {
-  background: linear-gradient(145deg, #f59e0b, #d97706);
+  background-color: #ffbd2e;
 }
 
 .increase {
-  background: linear-gradient(145deg, #10b981, #059669);
-  display: none;
+  background-color: #28ca42;
 }
 
-.text-opacity {
-  color: rgba(255, 255, 255, 0.8) !important;
-  font-weight: bold;
+.title {
+  color: #888;
+  font-size: 12px;
+  font-weight: 500;
+  letter-spacing: 1px;
 }
 
-/* ÉCRAN DE RÉSULTAT */
-.result {
-  height: 140px;
-  width: 100%;
-  background: linear-gradient(145deg, #1e293b, #0f172a);
-  color: #60a5fa;
+/* Écran de résultat */
+.result-container {
+  padding: 25px 20px;
+  background: #0f0f0f;
+  border-bottom: 1px solid #333;
+  min-height: 120px;
   display: flex;
-  align-items: flex-end;
+  flex-direction: column;
   justify-content: flex-end;
-  padding: 24px;
+  align-items: flex-end;
+}
+
+#inner-result {
+  color: #00ffc6;
   font-size: 48px;
   font-weight: 300;
-  letter-spacing: -1px;
-  border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+  text-align: right;
+  width: 100%;
   overflow: hidden;
   text-overflow: ellipsis;
-  white-space: nowrap;
+  transition: all 0.3s ease;
   font-variant-numeric: tabular-nums;
-  text-shadow: 0 2px 10px rgba(96, 165, 250, 0.3);
+  word-break: break-all;
+  max-width: 100%;
+  line-height: 1.2;
 }
 
-/* BOUTONS */
-.buttons {
+/* SUPPRIME .calculation-display car il n'existe pas dans ton HTML */
+/* .calculation-display {
+  color: #666;
+  font-size: 16px;
+  margin-bottom: 8px;
+  min-height: 20px;
+  width: 100%;
+  text-align: right;
+} */
+
+/* Grille des boutons */
+.buttons-grid {
   display: grid;
   grid-template-columns: repeat(4, 1fr);
   gap: 1px;
-  background: rgba(255, 255, 255, 0.05);
+  background: #333;
   padding: 1px;
-  transition: all 0.4s ease-in-out;
 }
 
 button {
-  height: 72px;
-  background: #1e293b;
-  color: #f8fafc;
-  cursor: pointer;
+  height: 70px;
   border: none;
+  background: #2a2a2a;
+  color: #fff;
   font-size: 22px;
   font-weight: 400;
+  cursor: pointer;
   transition: all 0.15s ease;
   outline: none;
   position: relative;
   overflow: hidden;
+  -webkit-user-select: none;
   user-select: none;
 }
 
 button:hover {
-  background: #2d3748;
-  transform: translateY(-2px);
+  background: #333;
 }
 
 button:active {
-  background: #374151;
-  transform: translateY(0);
-  transition-duration: 0.05s;
+  background: #3a3a3a;
+  transform: scale(0.97);
 }
 
-button::after {
-  content: '';
-  position: absolute;
-  top: 50%;
-  left: 50%;
-  width: 5px;
-  height: 5px;
-  background: rgba(255, 255, 255, 0.2);
-  opacity: 0;
-  border-radius: 100%;
-  transform: scale(1, 1) translate(-50%);
-  transform-origin: 50% 50%;
-}
-
-button:active::after {
-  animation: ripple 0.6s ease-out;
-}
-
-/* BOUTONS SPÉCIAUX */
+/* Styles spécifiques pour les boutons */
 .operator {
-  background: #334155;
+  background: #3a3a3a;
   font-size: 24px;
 }
 
+.operator:hover {
+  background: #444;
+}
+
 .orange {
-  background: linear-gradient(145deg, #f97316, #ea580c);
+  background: linear-gradient(145deg, #ff9500, #e68500);
   color: white;
 }
 
 .orange:hover {
-  background: linear-gradient(145deg, #fb923c, #f97316);
+  background: linear-gradient(145deg, #ffa726, #f57c00);
 }
 
 .equalSign {
-  background: linear-gradient(145deg, #3b82f6, #2563eb);
+  background: linear-gradient(145deg, #007aff, #0056cc);
   grid-column: span 2;
 }
 
 .equalSign:hover {
-  background: linear-gradient(145deg, #60a5fa, #3b82f6);
+  background: linear-gradient(145deg, #4dabf7, #339af0);
 }
 
 .bigger {
@@ -195,48 +199,41 @@ button:active::after {
 }
 
 .darker {
-  background: #0f172a;
+  background: #222;
 }
 
-/* ANIMATIONS */
-@keyframes ripple {
-  0% {
-    transform: scale(0, 0);
-    opacity: 0.5;
-  }
-  100% {
-    transform: scale(30, 30);
-    opacity: 0;
-  }
+/* Pied de page */
+.footer {
+  padding: 10px 20px;
+  background: #1a1a1a;
+  border-top: 1px solid #333;
+  text-align: center;
+  color: #666;
+  font-size: 11px;
+  letter-spacing: 0.5px;
 }
 
-@keyframes fadeIn {
-  from {
-    opacity: 0;
-    transform: translateY(10px);
-  }
-  to {
-    opacity: 1;
-    transform: translateY(0);
-  }
+/* Animation pour les boutons */
+@keyframes buttonPress {
+  0% { transform: scale(1); }
+  50% { transform: scale(0.95); }
+  100% { transform: scale(1); }
 }
 
-#calculatrice {
-  animation: fadeIn 0.5s ease-out;
+.pressed {
+  animation: buttonPress 0.2s ease;
 }
 
-/* ÉTATS */
-.hide {
-  height: 0;
-  opacity: 0;
-  overflow: hidden;
+/* État désactivé */
+button:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
 }
 
-/* RÉDUIT POUR MOBILE */
+/* Responsive */
 @media (max-width: 350px) {
   #calculatrice {
     width: 95%;
-    max-width: 300px;
   }
   
   button {
@@ -244,52 +241,53 @@ button:active::after {
     font-size: 20px;
   }
   
-  .result {
-    height: 120px;
+  #inner-result {
     font-size: 40px;
-    padding: 20px;
   }
 }
 
-/* THÈME CLAIR (optionnel) */
+/* Thème clair optionnel */
 @media (prefers-color-scheme: light) {
   body {
-    background: linear-gradient(135deg, #a78bfa 0%, #f0abfc 100%);
+    background: linear-gradient(135deg, #f5f7fa, #c3cfe2);
   }
   
   #calculatrice {
-    background: #ffffff;
-    box-shadow: 
-      0 20px 40px rgba(0, 0, 0, 0.1),
-      0 0 0 1px rgba(0, 0, 0, 0.05);
+    background: white;
+    border: 1px solid #ddd;
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
   }
   
-  .result {
-    background: #f8fafc;
-    color: #1e293b;
-    border-bottom: 1px solid #e2e8f0;
+  .header {
+    background: #f8f9fa;
+    border-bottom: 1px solid #eee;
+  }
+  
+  .result-container {
+    background: #f8f9fa;
+    border-bottom: 1px solid #eee;
+  }
+  
+  #inner-result {
+    color: #1a1a1a;
+  }
+  
+  .buttons-grid {
+    background: #eee;
   }
   
   button {
-    background: #f1f5f9;
-    color: #334155;
-    border-bottom: 1px solid #e2e8f0;
+    background: white;
+    color: #333;
   }
   
   button:hover {
-    background: #e2e8f0;
+    background: #f5f5f5;
   }
   
-  .operator {
-    background: #e2e8f0;
-  }
-  
-  .orange {
-    background: linear-gradient(145deg, #f97316, #ea580c);
-    color: white;
-  }
-  
-  .darker {
-    background: #f1f5f9;
+  .footer {
+    background: #f8f9fa;
+    border-top: 1px solid #eee;
+    color: #888;
   }
 }

@@ -1,51 +1,65 @@
 <!DOCTYPE html>
-<html lang="en">
-
+<html lang="fr">
 <head>
-    <meta charset="UTF-8" />
-    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <link rel="stylesheet" href="css/style.css" />
-    <title>Calculatrice</title>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Calculatrice Modern</title>
+    <link rel="stylesheet" href="css/style.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
 </head>
-
 <body>
-    <div class="container">
-        <div id="calculatrice">
-            <div class="result">
-                <div class="options">
-                    <span class="quit action"><span>x</span></span>
-                    <span class="reduce action"><span>-</span></span>
-                    <span class="increase action"><span>+</span></span>
-                </div>
-
-                <div id="inner-result">0</div>
+    <div id="calculatrice">
+        <div class="header">
+            <div class="controls">
+                <button class="control-btn quit" data-tooltip="Fermer">
+                    <span>×</span>
+                </button>
+                <button class="control-btn reduce" data-tooltip="Réduire">
+                    <span>−</span>
+                </button>
+                <button class="control-btn increase" data-tooltip="Agrandir">
+                    <span>+</span>
+                </button>
             </div>
-
-            <div class="buttons">
-                <button class="darker operator bigger">AC</button>
-                <button class="darker operator">%</button>
-                <button class="orange operator">/</button>
-                <button>7</button>
-                <button>8</button>
-                <button>9</button>
-                <button class="orange operator">x</button>
-                <button>4</button>
-                <button>5</button>
-                <button>6</button>
-                <button class="orange operator">-</button>
-                <button>1</button>
-                <button>2</button>
-                <button>3</button>
-                <button class="orange operator">+</button>
-                <button class="bigger bottom-left">0</button>
-                <button>,</button>
-                <button class="bottom-right orange equalSign">=</button>
-            </div>
+            <div class="title">CALCULATRICE</div>
+        </div>
+        
+        <div class="result-container">
+            <div class="calculation-display"></div>
+            <div id="inner-result">0</div>
+        </div>
+        
+        <div class="buttons-grid">
+            <button class="operator orange">AC</button>
+            <button class="operator orange">+/-</button>
+            <button class="operator orange">%</button>
+            <button class="operator orange">÷</button>
+            
+            <button>7</button>
+            <button>8</button>
+            <button>9</button>
+            <button class="operator orange">×</button>
+            
+            <button>4</button>
+            <button>5</button>
+            <button>6</button>
+            <button class="operator orange">-</button>
+            
+            <button>1</button>
+            <button>2</button>
+            <button>3</button>
+            <button class="operator orange">+</button>
+            
+            <button class="bigger">0</button>
+            <button>,</button>
+            <button class="operator equalSign orange">=</button>
+        </div>
+        
+        <div class="footer">
+            Calculatrice Modern • v2.0
         </div>
     </div>
-
+    
     <script src="js/app.js"></script>
 </body>
-
 </html>
