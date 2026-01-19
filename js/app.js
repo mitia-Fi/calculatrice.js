@@ -1,122 +1,160 @@
 (() => {
-  const listNumbers   = document.querySelectorAll("button:not(.operator):not(.equalSign):not(.action)");
+  // SELECTEURS
+  const listNumbers = document.querySelectorAll("button:not(.operator):not(.equalSign)");
   const listOperators = document.querySelectorAll("button.operator:not(.equalSign)");
-  const listOptions   = document.querySelectorAll(".control-btn");
-  const resultElem    = document.getElementById("inner-result");
-  const quitButton    = document.querySelector(".quit");
-  const reduceButton  = document.querySelector(".reduce");
-  const increaseButton= document.querySelector(".increase");
-  const equalSign     = document.querySelector(".equalSign");
-  const calcDisplay   = document.querySelector(".calculation-display");
+  const listOptions = document.querySelectorAll("span.action");
+  const resultElem = document.getElementById("inner-result");
+  const quitButton = document.querySelector(".quit");
+  const reduceButton = document.querySelector(".reduce");
+  const increaseButton = document.querySelector(".increase");
+  const equalSign = document.querySelector(".equalSign");
+  const buttonsContainer = document.querySelector(".buttons");
 
+  // ÉTAT
   let firstNumber = "";
   let secondNumber = "";
   let currentOperator = "";
-  let calculationString = "";
-  let lastResult = 0;
+  let shouldResetScreen = false;
 
+  // OPÉRATIONS
   const operations = {
     "×": (a, b) => {
       const result = a * b;
-      return Number.isInteger(result) ? result : parseFloat(result.toFixed(10));
+      return Math.abs(result) > 1e12 ? result.toExponential(6) : 
+             Number.isInteger(result) ? result : parseFloat(result.toFixed(8));
     },
     "+": (a, b) => {
       const result = a + b;
-      return Number.isInteger(result) ? result : parseFloat(result.toFixed(10));
+      return Math.abs(result) > 1e12 ? result.toExponential(6) : 
+             Number.isInteger(result) ? result : parseFloat(result.toFixed(8));
     },
     "-": (a, b) => {
       const result = a - b;
-      return Number.isInteger(result) ? result : parseFloat(result.toFixed(10));
+      return Math.abs(result) > 1e12 ? result.toExponential(6) : 
+             Number.isInteger(result) ? result : parseFloat(result.toFixed(8));
     },
     "÷": (a, b) => {
       if (b === 0) {
-        return "Erreur";
+        showError("Division par zéro");
+        return null;
       }
       const result = a / b;
-      return Number.isInteger(result) ? result : parseFloat(result.toFixed(10));
+      return Math.abs(result) > 1e12 ? result.toExponential(6) : 
+             Number.isInteger(result) ? result : parseFloat(result.toFixed(8));
     },
-    "%": (a, b) => a % b,
+    "%": (a, b) => a % b
   };
 
-  // Tooltips pour les contrôles
+  // TOOLTIPS POUR LES CONTROLES
   listOptions.forEach(opt => {
-    opt.addEventListener("mouseover", () => showTooltip(opt));
-    opt.addEventListener("mouseout", () => hideTooltip(opt));
+    opt.dataset.tooltip = opt.classList.contains("quit") ? "Fermer" :
+                         opt.classList.contains("reduce") ? "Réduire" : "Agrandir";
+    
+    opt.addEventListener("mouseover", () => {
+      opt.children[0].classList.add("text-opacity");
+      opt.style.transform = "scale(1.3)";
+    });
+    
+    opt.addEventListener("mouseout", () => {
+      opt.children[0].classList.remove("text-opacity");
+      opt.style.transform = "scale(1)";
+    });
   });
 
-  const showTooltip = elem => {
-    elem.style.transform = "scale(1.2)";
-  };
-
-  const hideTooltip = elem => {
-    elem.style.transform = "scale(1)";
-  };
-
-  // Quitter
+  // FERMER (avec animation)
   quitButton.addEventListener("click", () => {
-    document.getElementById("calculatrice").style.opacity = "0";
-    document.getElementById("calculatrice").style.transform = "translateY(20px)";
+    const calc = document.getElementById("calculatrice");
+    calc.style.transform = "scale(0.9)";
+    calc.style.opacity = "0";
+    
     setTimeout(() => {
-      document.getElementById("calculatrice").style.display = "none";
-      document.body.innerHTML = '<div style="text-align:center;padding:50px;color:#888">Calculatrice fermée. Actualisez la page.</div>';
+      calc.style.display = "none";
+      document.body.innerHTML = `
+        <div style="
+          text-align: center;
+          padding: 50px;
+          color: white;
+          font-family: system-ui;
+          font-size: 18px;
+          background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+          height: 100vh;
+          display: flex;
+          align-items: center;
+          justify-content: center;
+        ">
+          <div>
+            <div style="font-size: 48px; margin-bottom: 20px;">👋</div>
+            <div>Calculatrice fermée</div>
+            <div style="font-size: 14px; opacity: 0.7; margin-top: 10px;">
+              Actualise la page pour recommencer
+            </div>
+          </div>
+        </div>
+      `;
     }, 300);
   });
 
-  // Réduire/Agrandir
+  // RÉDUIRE / AGRANDIR
   reduceButton.addEventListener("click", () => {
-    document.querySelector(".buttons-grid").style.display = "none";
-    document.querySelector(".footer").style.display = "none";
+    buttonsContainer.classList.add("hide");
     reduceButton.style.display = "none";
-    increaseButton.style.display = "flex";
+    increaseButton.style.display = "block";
     document.getElementById("calculatrice").style.width = "260px";
+    document.getElementById("calculatrice").style.transition = "width 0.3s ease";
   });
 
   increaseButton.addEventListener("click", () => {
-    document.querySelector(".buttons-grid").style.display = "grid";
-    document.querySelector(".footer").style.display = "block";
-    reduceButton.style.display = "flex";
+    buttonsContainer.classList.remove("hide");
+    reduceButton.style.display = "block";
     increaseButton.style.display = "none";
     document.getElementById("calculatrice").style.width = "320px";
   });
 
-  // Nombres
+  // GESTION DES NOMBRES
   listNumbers.forEach(btn => {
     btn.addEventListener("click", () => {
-      handleButtonPress(btn);
-      handleNumberInput(btn.textContent);
+      animateButton(btn);
+      handleNumber(btn.textContent);
     });
   });
 
-  // Opérateurs
+  // GESTION DES OPÉRATEURS
   listOperators.forEach(op => {
     op.addEventListener("click", () => {
-      handleButtonPress(op);
-      handleOperatorInput(op.textContent);
+      animateButton(op);
+      handleOperator(op.textContent);
     });
   });
 
-  // Bouton égal
+  // BOUTON ÉGAL
   equalSign.addEventListener("click", () => {
-    handleButtonPress(equalSign);
-    calculateResult();
+    animateButton(equalSign);
+    calculate();
   });
 
-  // Animation des boutons
-  const handleButtonPress = btn => {
-    btn.classList.add("pressed");
-    setTimeout(() => btn.classList.remove("pressed"), 200);
-  };
+  // ANIMATION DES BOUTONS
+  function animateButton(btn) {
+    btn.style.transform = "scale(0.95)";
+    setTimeout(() => {
+      btn.style.transform = "";
+    }, 100);
+  }
 
-  // Gestion des nombres
-  const handleNumberInput = value => {
+  // GESTION DES NOMBRES
+  function handleNumber(value) {
     if (value === "AC") {
       resetCalculator();
       return;
     }
 
     if (value === "," || value === ".") {
-      handleDecimalPoint();
+      addDecimal();
       return;
+    }
+
+    if (shouldResetScreen) {
+      firstNumber = "";
+      shouldResetScreen = false;
     }
 
     if (!currentOperator) {
@@ -130,29 +168,37 @@
       else secondNumber += value;
       updateDisplay(`${firstNumber} ${currentOperator} ${secondNumber}`);
     }
-  };
+  }
 
-  // Gestion des opérateurs
-  const handleOperatorInput = operator => {
+  // GESTION DES OPÉRATEURS
+  function handleOperator(operator) {
     if (operator === "AC") {
       resetCalculator();
       return;
     }
 
-    if (!firstNumber) return;
+    if (!firstNumber && operator !== "-") return;
 
-    if (secondNumber && currentOperator) {
-      calculateResult();
+    if (operator === "+/-" && firstNumber) {
+      firstNumber = firstNumber.startsWith("-") ? 
+                   firstNumber.substring(1) : `-${firstNumber}`;
+      updateDisplay(firstNumber);
+      return;
     }
 
-    currentOperator = operator;
-    calculationString = `${firstNumber} ${currentOperator}`;
-    calcDisplay.textContent = calculationString;
-    resultElem.textContent = firstNumber;
-  };
+    if (secondNumber && currentOperator) {
+      calculate();
+    }
 
-  // Point décimal
-  const handleDecimalPoint = () => {
+    if (firstNumber) {
+      currentOperator = operator;
+      updateDisplay(`${firstNumber} ${currentOperator}`);
+      shouldResetScreen = false;
+    }
+  }
+
+  // POINT DÉCIMAL
+  function addDecimal() {
     if (!currentOperator) {
       if (!firstNumber.includes(",")) {
         firstNumber = firstNumber ? firstNumber + "," : "0,";
@@ -164,63 +210,93 @@
         updateDisplay(`${firstNumber} ${currentOperator} ${secondNumber}`);
       }
     }
-  };
+  }
 
-  // Calcul
-  const calculateResult = () => {
+  // CALCUL
+  function calculate() {
     if (!firstNumber || !currentOperator || !secondNumber) return;
 
     const num1 = parseFloat(firstNumber.replace(",", "."));
     const num2 = parseFloat(secondNumber.replace(",", "."));
     
-    const result = operations[currentOperator](num1, num2);
-    
-    if (result === "Erreur") {
-      resultElem.textContent = "Erreur";
-      resultElem.style.color = "#ff4444";
-      setTimeout(() => {
-        resetCalculator();
-        resultElem.style.color = "#00ffc6";
-      }, 1500);
+    if (isNaN(num1) || isNaN(num2)) {
+      showError("Erreur de saisie");
       return;
     }
 
-    lastResult = result;
+    const operation = operations[currentOperator];
+    if (!operation) return;
+
+    const result = operation(num1, num2);
+    
+    if (result === null) return; // Erreur déjà gérée
+
     const formattedResult = result.toString().replace(".", ",");
     
-    calcDisplay.textContent = `${firstNumber} ${currentOperator} ${secondNumber} =`;
-    resultElem.textContent = formattedResult;
+    // Affichage avec effet
+    resultElem.style.opacity = "0";
+    resultElem.style.transform = "translateY(10px)";
     
+    setTimeout(() => {
+      resultElem.textContent = formattedResult;
+      resultElem.style.opacity = "1";
+      resultElem.style.transform = "translateY(0)";
+      resultElem.style.transition = "all 0.3s ease";
+    }, 150);
+
     firstNumber = formattedResult;
     secondNumber = "";
     currentOperator = "";
-  };
+    shouldResetScreen = true;
+  }
 
-  // Mise à jour de l'affichage
-  const updateDisplay = (value) => {
+  // MISE À JOUR DE L'AFFICHAGE
+  function updateDisplay(value) {
     resultElem.textContent = value;
-    resultElem.style.color = "#00ffc6";
-  };
+    
+    // Effet de frappe
+    resultElem.style.transform = "scale(1.02)";
+    setTimeout(() => {
+      resultElem.style.transform = "scale(1)";
+    }, 50);
+  }
 
-  // Réinitialisation
-  const resetCalculator = () => {
+  // RÉINITIALISATION
+  function resetCalculator() {
     firstNumber = "";
     secondNumber = "";
     currentOperator = "";
-    calculationString = "";
+    shouldResetScreen = false;
     resultElem.textContent = "0";
-    calcDisplay.textContent = "";
-    resultElem.style.color = "#00ffc6";
-  };
+    resultElem.style.color = "";
+  }
 
-  // Touches clavier
+  // AFFICHAGE D'ERREUR
+  function showError(message) {
+    const originalColor = resultElem.style.color;
+    resultElem.textContent = message;
+    resultElem.style.color = "#ef4444";
+    
+    setTimeout(() => {
+      resultElem.textContent = "0";
+      resultElem.style.color = originalColor;
+      resetCalculator();
+    }, 1500);
+  }
+
+  // SUPPORT CLAVIER
   document.addEventListener("keydown", (e) => {
     const key = e.key;
     
+    // Empêcher le comportement par défaut pour les touches de calculatrice
+    if ("0123456789/*-+.,Enter= EscapeDelete%".includes(key)) {
+      e.preventDefault();
+    }
+    
     if (key >= "0" && key <= "9") {
-      handleNumberInput(key);
+      handleNumber(key);
     } else if (key === "." || key === ",") {
-      handleNumberInput(",");
+      handleNumber(",");
     } else if (key === "+" || key === "-" || key === "*" || key === "/") {
       const operatorMap = {
         "+": "+",
@@ -228,16 +304,25 @@
         "*": "×",
         "/": "÷"
       };
-      handleOperatorInput(operatorMap[key]);
+      handleOperator(operatorMap[key]);
     } else if (key === "Enter" || key === "=") {
-      calculateResult();
+      calculate();
     } else if (key === "Escape" || key === "Delete") {
       resetCalculator();
     } else if (key === "%") {
-      handleOperatorInput("%");
+      handleOperator("%");
     }
   });
 
-  // Initialisation
+  // INITIALISATION
   resetCalculator();
+
+  // EFFET DE CHARGEMENT
+  document.addEventListener("DOMContentLoaded", () => {
+    document.getElementById("calculatrice").style.opacity = "0";
+    setTimeout(() => {
+      document.getElementById("calculatrice").style.transition = "opacity 0.5s ease";
+      document.getElementById("calculatrice").style.opacity = "1";
+    }, 100);
+  });
 })();
